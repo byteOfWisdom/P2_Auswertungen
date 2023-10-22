@@ -58,6 +58,7 @@ def c(preview):
 	plt.arrow(float(r), 0, 0, float(wl), width=0.01, head_width=0.1, head_length=0.1, label=labelWL, color="red", length_includes_head=True)
 	plt.arrow(0, 0, float(r), 0, width=0.01, head_width=0.1, head_length=0.1, label=labelR, color="green", length_includes_head=True)
 	plt.legend()
+	plt.title('Fig 1: Zeigerdiagram des komplexen Widerstands einer Spule')
 
 	if preview:
 		plt.show()
@@ -85,6 +86,7 @@ def d(preview):
 	plt.xlabel("Re(U) [V]")
 	plt.ylabel("Im(U) [V]")
 	plt.legend()
+	plt.title('Fig 2: Zeigerdiagram des Phasenschiebers')
 
 	if preview:
 		plt.show()
@@ -155,16 +157,9 @@ def filter_graph(data, suffix, preview):
 	db_values = forward(ua)
 	db_err = np.sqrt(sq(20 / (ua * np.log(10))) * sq(ua * 1e-2) + sq(20 / (ue * np.log(10))) * sq(ue * 1e-2))
 
-	easyparse.write_printable({
-		'dB(U_a)': db_values,
-		'db_err': db_err,
-	}, '234e_' + suffix + '.csv')
-
-
 	plt.xscale('log')
 	#plt.yscale('function', functions=(inverse, forward))
 	plt.ylim([min(db_values) - 1, 0.5])
-
 
 	plt.ylabel(r'$dB(A) = 20 \times \log_{10}{(\frac{U_a}{U_e})}$')
 	plt.xlabel(r'$\Omega = \frac{\nu}{\nu_{gr}}$')
@@ -172,17 +167,23 @@ def filter_graph(data, suffix, preview):
 	if suffix == 'b':
 		f0_index = np.where(ua == min(ua))[0][0]
 		f0 = f[f0_index]
+		f0_ = ev(f0, f0 * 5e-2)
 
-		q_theo = 1 / (2 * np.pi * f0 * 1e3 * R * C)
-		note('Q_theo = ' + str(round(q_theo, 2)))
+		q_theo = 1 / (2 * np.pi * f0_ * 1e3 * R * C)
+		note('Q_theo = ' + str(q_theo))
 
 
 		intersects = all_intersects(f, ua, ue / np.sqrt(2))
 		df1 = intersects[0]
 		df2 = intersects[1]
+		df1_ = ev(df1, df1 * 5e-2)
+		df2_ = ev(df2, df2 * 5e-2)
 
-		q_exp = f0 / (df2 - df1)
-		note('Q_exp = ' + str(round(q_exp, 2)))
+		note('fgr1 = ' + str(df1_) + ' kHz')
+		note('fgr2 = ' + str(df2_) + ' kHz')
+		note('f0 = ' + str(f0_) + ' kHz')
+		q_exp = f0_ / (df2_ - df1_)
+		note('Q_exp = ' + str(q_exp))
 
 		plt.vlines([df1 / f0, df2 / f0], min(db_values) - 2, 1, color="green", linestyle='--', label=r'$\nu_{gr}$')
 		plt.vlines([1], min(db_values) - 2, 1, color="blue", linestyle='--', label=r'$\nu_{0}$')
@@ -194,11 +195,11 @@ def filter_graph(data, suffix, preview):
 	else:	
 		fgr_theo = 1e-3 / (2 * np.pi * R * C) #1e-3 hz -> khz
 		fgr = all_intersects(f, ua, ue / np.sqrt(2))[0]
-		fgr_label = r'$ \nu_{gr} =' + str(round(fgr, 2)) + ' kHz$'
-		fgr_theo_label = r'$ \nu_{gr, theo} =' + str(round(fgr_theo, 2)) + ' kHz$'
+		fgr_label = r'$ \nu_{gr} =' + str(round(fgr, 3)) + ' kHz$'
+		fgr_theo_label = r'$ \nu_{gr, theo} =' + str(round(fgr_theo, 3)) + ' kHz$'
 
-		note("f_gr_theo_" + suffix + " = " + str(round(fgr_theo, 2)) + ' kHz')
-		note("f_gr_exp_" + suffix + " = " + str(round(fgr, 2)) + ' kHz')
+		note("f_gr_theo_" + suffix + " = " + str(round(fgr_theo, 3)) + ' kHz')
+		note("f_gr_exp_" + suffix + " = " + str(round(fgr, 3)) + ' kHz')
 
 		plt.errorbar(f / fgr, db_values, db_err,  fmt='x', label='Messwerte')
 
@@ -213,11 +214,11 @@ def filter_graph(data, suffix, preview):
 	plt.legend()
 
 	if suffix == 'lp':
-		plt.title(r'Fig 3: Tiefpass Filter')
+		plt.title(r'Fig 3a: Tiefpass Filter')
 	if suffix == 'hp':
-		plt.title(r'Fig 4: Hochpass Filter')
+		plt.title(r'Fig 3b: Hochpass Filter')
 	if suffix == 'b':
-		plt.title(r'Fig 5: Sperrfilter')
+		plt.title(r'Fig 3c: Sperrfilter')
 
 	if preview:
 		plt.show()
@@ -245,7 +246,7 @@ def e(preview):
 		'delta_dB_highpass': hpe,
 		'dB_Sperrfilter': b, 
 		'delta_dB_Sperrfilter': be,
-	}, '234e.csv')
+	}, 'results/234e.csv')
 
 
 
@@ -263,6 +264,8 @@ def i(preview):
 
 	note('i:')
 	note('f_max_exp = ' + str(f_max))
+	note('U_max = ' + str(percent_error(max(u))) + ' V')
+	note('U(f=0) = ' + str(percent_error(u[0])) + ' V')
 
 	intersects = all_intersects(f, u, max(u) / np.sqrt(2))
 	f1, f2 = intersects[0], intersects[1]
@@ -275,7 +278,7 @@ def i(preview):
 	delta_f = f2_ - f1_
 
 	#Q aus resonanzueberhoeung:
-	Q_u = u_max / percent_error(u[0])
+	Q_u = u_max / percent_error(u[1])
 	note('Q aus der Resonanzueberhoehung:')
 	note('Q_u = ' + str(Q_u))
 
@@ -285,12 +288,15 @@ def i(preview):
 	note('Q_delta_f = ' + str(Q_delta_w))
 
 
+	w_max = f_max / (2 * np.pi)
 	#Q aus Q = w0 * L / Rl
-	w0 = (1 / sq(L * C)) ** 0.5
-	note('w_0=' + str(w0))
+	w0 = (1 / np.sqrt(L * C))
+	#w0 = w_max / ((1 - (1 / (2 * sq(Q_delta_w)))) ** 0.5)
+	note('w_0=' + str(round(w0, 3)))
+	note('f_0=' + str(round(w0 / (2 * np.pi), 3)))
 	Q_3 = w0 * L / R
 	note('Q aus der der letzten Formel:')
-	note('Q_form = ' + str(Q_3))
+	note('Q_form = ' + str(round(Q_3, 3)))
 
 
 	plt.grid()
@@ -305,6 +311,7 @@ def i(preview):
 	plt.vlines(f2, 0, max(u) + 1, color='red', linestyle='--', label=r'$\nu_{gr, 2} =' + str(round(f2, 2)) +'Hz$')
 	plt.hlines([max(u) / (np.sqrt(2))], 0, max(f) + 10, color='yellow', linestyle='--', label=r'$\frac{U_{max}}{\sqrt{2}}$')
 
+	plt.title('Fig 4: Resonanzkurve des Schwingkreises')
 	plt.legend()
 	
 	if preview:
