@@ -140,7 +140,6 @@ def filter_graph(data, suffix, preview):
 	ua = data['ua']
 	f = data['f']
 
-	db_err = np.sqrt(sq(20 / (ua * np.log(10))) * sq(ua * 1e-2) + sq(20 / (ue * np.log(10))) * sq(ue * 1e-2))
 
 	ua_ = np.array(list(map(percent_error, ua)))
 	ue_ = percent_error(ue)
@@ -153,13 +152,21 @@ def filter_graph(data, suffix, preview):
 	inverse = lambda y: (10 ** (y / 20)) * ue
 
 	#plt.loglog(base=10)
-	
+	db_values = forward(ua)
+	db_err = np.sqrt(sq(20 / (ua * np.log(10))) * sq(ua * 1e-2) + sq(20 / (ue * np.log(10))) * sq(ue * 1e-2))
+
+	easyparse.write_printable({
+		'dB(U_a)': db_values,
+		'db_err': db_err,
+	}, '234e_' + suffix + '.csv')
+
+
 	plt.xscale('log')
-	plt.yscale('function', functions=(inverse, forward))
-	plt.ylim([0, max(ua) + 0.01])
+	#plt.yscale('function', functions=(inverse, forward))
+	plt.ylim([min(db_values) - 1, 0.5])
 
 
-	plt.ylabel(r'$db(A) = 20 \times \log_{10}{(\frac{U_a}{U_e})}$')
+	plt.ylabel(r'$dB(A) = 20 \times \log_{10}{(\frac{U_a}{U_e})}$')
 	plt.xlabel(r'$\Omega = \frac{\nu}{\nu_{gr}}$')
 
 	if suffix == 'b':
@@ -177,11 +184,11 @@ def filter_graph(data, suffix, preview):
 		q_exp = f0 / (df2 - df1)
 		note('Q_exp = ' + str(round(q_exp, 2)))
 
-		plt.vlines([df1 / f0, df2 / f0], -1, max(ua / ue) + 0.1, color="green", linestyle='--', label=r'$\nu_{gr}$')
-		plt.vlines([1], -1, max(ua / ue) + 0.1, color="blue", linestyle='--', label=r'$\nu_{0}$')
-		plt.hlines(ue/np.sqrt(2), -1, max(f / f0) + 1, color='yellow', linestyle='--', label=r'$\frac{U_e}{\sqrt{2}}$')
+		plt.vlines([df1 / f0, df2 / f0], min(db_values) - 2, 1, color="green", linestyle='--', label=r'$\nu_{gr}$')
+		plt.vlines([1], min(db_values) - 2, 1, color="blue", linestyle='--', label=r'$\nu_{0}$')
+		plt.hlines(forward(ue/np.sqrt(2)), -1, max(f / f0) + 1, color='yellow', linestyle='--', label=r'$\frac{U_e}{\sqrt{2}}$')
 
-		plt.plot(f / f0, ua, 'x', label='Messwerte')
+		plt.errorbar(f / f0, db_values, db_err, fmt='x', label='Messwerte')
 
 
 	else:	
@@ -193,11 +200,11 @@ def filter_graph(data, suffix, preview):
 		note("f_gr_theo_" + suffix + " = " + str(round(fgr_theo, 2)) + ' kHz')
 		note("f_gr_exp_" + suffix + " = " + str(round(fgr, 2)) + ' kHz')
 
-		plt.plot(f / fgr, ua, 'x', label='Messwerte')
+		plt.errorbar(f / fgr, db_values, db_err,  fmt='x', label='Messwerte')
 
-		plt.hlines(ue/np.sqrt(2), -1, max(f / fgr) + 1, color='yellow', linestyle='--', label=r'$\frac{U_e}{\sqrt{2}}$')
-		plt.vlines(1, -1, 1.1, color="green", linestyle='--', label=fgr_label)
-		plt.vlines(fgr_theo / fgr, -1, 1.1, color="blue", linestyle='--', label=fgr_theo_label)
+		plt.hlines(forward(ue/np.sqrt(2)), -1, max(f / fgr) + 1, color='yellow', linestyle='--', label=r'$\frac{U_e}{\sqrt{2}}$')
+		plt.vlines(1, min(db_values) - 2, 1, color="green", linestyle='--', label=fgr_label)
+		plt.vlines(fgr_theo / fgr, min(db_values) - 2, 1, color="blue", linestyle='--', label=fgr_theo_label)
 
 		plt.xlim([min(f / fgr) - 0.05, max(f / fgr) + 0.05])
 		#plt.ylim([0, 1.05])
@@ -218,6 +225,8 @@ def filter_graph(data, suffix, preview):
 		plt.savefig('results/234_e_' + suffix + '.png', bbox_inches='tight')
 	plt.clf()
 
+	return db_values, db_err
+
 
 def e(preview):
 	note('e:')
@@ -225,9 +234,19 @@ def e(preview):
 	highpass = easyparse.parse('data/234eHP.csv')
 	blocking = easyparse.parse('data/234eB.csv')
 
-	filter_graph(lowpass, 'lp', preview)
-	filter_graph(highpass, 'hp', preview)
-	filter_graph(blocking, 'b', preview)
+	lp, lpe = filter_graph(lowpass, 'lp', preview)
+	hp, hpe = filter_graph(highpass, 'hp', preview)
+	b, be = filter_graph(blocking, 'b', preview)
+
+	easyparse.write_printable({
+		'dB_Tiefpass': lp, 
+		'delta_dB_Hochpass': lpe,
+		'dB_Hochpass': hp, 
+		'delta_dB_highpass': hpe,
+		'dB_Sperrfilter': b, 
+		'delta_dB_Sperrfilter': be,
+	}, '234e.csv')
+
 
 
 def i(preview):
@@ -261,7 +280,7 @@ def i(preview):
 	note('Q_u = ' + str(Q_u))
 
 	#Q aus der Resonanzbreite
-	Q_delta_w = ((f_max / delta_f)**2 - 1) ** 0.5
+	Q_delta_w = ((f_max / delta_f)**2 - 0.5) ** 0.5
 	note('Q aus der Resonanzbreite:')
 	note('Q_delta_f = ' + str(Q_delta_w))
 

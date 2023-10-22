@@ -3,10 +3,10 @@ L = ( 34.861895884 +- 0.81741603 ) * 10^-4 H
 
 
 e:
-f_gr_theo_lp = 1.06kHz
-f_gr_exp_lp = 1.1kHz
-f_gr_theo_hp = 1.06kHz
-f_gr_exp_hp = 1.19kHz
+f_gr_theo_lp = 1.06 kHz
+f_gr_exp_lp = 1.1 kHz
+f_gr_theo_hp = 1.06 kHz
+f_gr_exp_hp = 1.19 kHz
 Q_theo = 1.52
 Q_exp = 1.32
 
@@ -15,7 +15,8 @@ f_max_exp = 700.0
 Q aus der Resonanzueberhoehung:
 Q_u = ( 67.3 +- 1.0 ) * 10^0
 Q aus der Resonanzbreite:
-Q_delta_f = ( 14.1 +- 2.8 ) * 10^0
+Q_delta_f = ( 14.2 +- 2.8 ) * 10^0
 w_0=18518518.51851852
 Q aus der der letzten Formel:
 Q_form = 70175.43859649122
+
