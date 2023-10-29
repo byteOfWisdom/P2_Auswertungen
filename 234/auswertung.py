@@ -12,6 +12,10 @@ import pointer_diagrams
 
 misc_values = ''
 
+def save(file):
+	plt.savefig(file, bbox_inches='tight')
+	plt.clf()
+
 
 def note(s):
 	global misc_values
@@ -34,9 +38,9 @@ def percent_error(n):
 def c(preview):
 	note("c:")
 	data = easyparse.parse('data/234c.csv')
-	r = ev(data["r"], data["r"] * 1e-2)
-	u = ev(data["u"], data["u"] * 1e-2)
-	i = ev(data["i"], data["i"] * 1e-2)
+	r = ev(data["r"], 0.1)
+	u = ev(data["u"], 1e-4)
+	i = ev(data["i"], 1e-2)
 	w = ev(data["w"] * 2 * np.pi, 0)
 
 	z = u/i
@@ -50,8 +54,8 @@ def c(preview):
 
 	plt.axis('scaled')
 	plt.grid()
-	plt.xlim([-0.1, 3])
-	plt.ylim([-0.1, 3])
+	plt.xlim([-0.1, float(r) + 1])
+	plt.ylim([-0.1, float(wl) + 1])
 	plt.xlabel("Im(Z)")
 	plt.ylabel("Re(Z)")
 	plt.arrow(0, 0, float(r), float(wl), width=0.01, head_width=0.1, head_length=0.1, label=labelZ, color="blue", length_includes_head=True)
@@ -137,14 +141,25 @@ def all_intersects(x, y, y_cutoff):
 	return intersects
 
 
+def db(v, ref):
+	val = 20 * np.log10(v / ref)
+	return val
+
+
+def db_err(v, ref):
+	err = np.sqrt(sq(20 / (v * np.log(10))) * sq(v * 1e-2) + sq(20 / (ref * np.log(10))) * sq(ref * 1e-2))
+	return err
+
+
 def filter_graph(data, suffix, preview):
 	ue = data['ue'] # from khz to hz
 	ua = data['ua']
 	f = data['f']
 
 
-	ua_ = np.array(list(map(percent_error, ua)))
-	ue_ = percent_error(ue)
+	ua_err = lambda x: ev(x, 0.01)
+	ua_ = np.array(list(map(ua_err, ua)))
+	ue_ = ev(ue, 0.01)
 	a_err = ua_ / ue_
 
 	R = 100
@@ -176,8 +191,8 @@ def filter_graph(data, suffix, preview):
 		intersects = all_intersects(f, ua, ue / np.sqrt(2))
 		df1 = intersects[0]
 		df2 = intersects[1]
-		df1_ = ev(df1, df1 * 5e-2)
-		df2_ = ev(df2, df2 * 5e-2)
+		df1_ = ev(df1, 25)
+		df2_ = ev(df2, 25)
 
 		note('fgr1 = ' + str(df1_) + ' kHz')
 		note('fgr2 = ' + str(df2_) + ' kHz')
@@ -235,26 +250,60 @@ def e(preview):
 	highpass = easyparse.parse('data/234eHP.csv')
 	blocking = easyparse.parse('data/234eB.csv')
 
-	lp, lpe = filter_graph(lowpass, 'lp', preview)
-	hp, hpe = filter_graph(highpass, 'hp', preview)
-	b, be = filter_graph(blocking, 'b', preview)
+	try:
+		lp, lpe = filter_graph(lowpass, 'lp', preview)
+	except:
+		lpe = db_err(lowpass['ua'], lowpass['ue'])
+		lp = db(lowpass['ua'], lowpass['ue'])
+		plt.plot(lowpass['f'], lp, 'x')
+		plt.title('Tiefpass Filter, Daten fehlerhaft')
+
+		if preview:	plt.show()
+		else: save('results/234_e_lp.png')
+
+	try:
+		hp, hpe = filter_graph(highpass, 'hp', preview)
+	except:
+		hpe = db_err(highpass['ua'], highpass['ue']) 
+		hp = db(highpass['ua'], highpass['ue'])
+		plt.plot(highpass['f'], hp, 'x')
+		plt.title('Hochpass Filter, Daten fehlerhaft')
+
+		if preview:	plt.show()
+		else: save('results/234_e_hp.png')
+
+	try:
+		b, be = filter_graph(blocking, 'b', preview)
+	except:
+		be = db_err(blocking['ua'], blocking['ue'])
+		b = db(blocking['ua'], blocking['ue'])
+		plt.plot(blocking['f'], b, 'x')
+		plt.title('Sperrfilter, Daten fehlerhaft')
+
+		if preview:	plt.show()
+		else: save('results/234_e_b.png')
 
 	easyparse.write_printable({
 		'dB_Tiefpass': lp, 
 		'delta_dB_Hochpass': lpe,
+	}, 'results/234e_lp.csv')
+	
+	easyparse.write_printable({
 		'dB_Hochpass': hp, 
 		'delta_dB_highpass': hpe,
+	}, 'results/234e_hp.csv')
+
+	easyparse.write_printable({
 		'dB_Sperrfilter': b, 
 		'delta_dB_Sperrfilter': be,
-	}, 'results/234e.csv')
-
+	}, 'results/234e_b.csv')
 
 
 def i(preview):
 	data = easyparse.parse('data/234i.csv')
 	f = data['f']
 	u = data['ua']
-	ue = data['ue']
+	#ue = data['ue']
 	C = data['c']
 	R = data['rl']
 	L = data['l']
@@ -264,21 +313,21 @@ def i(preview):
 
 	note('i:')
 	note('f_max_exp = ' + str(f_max))
-	note('U_max = ' + str(percent_error(max(u))) + ' V')
-	note('U(f=0) = ' + str(percent_error(u[0])) + ' V')
+	note('U_max = ' + str(ev(max(u), 0.01)) + ' V')
+	note('U(f=0) = ' + str(ev(u[1], 0.01)) + ' V')
 
 	intersects = all_intersects(f, u, max(u) / np.sqrt(2))
 	f1, f2 = intersects[0], intersects[1]
 
-	f1_ = percent_error(f1)
-	f2_ = percent_error(f2)
-	ue_ = percent_error(ue)
-	u_max = percent_error(max(u))
+	f1_ = ev(f1, 25)
+	f2_ = ev(f2, 25)
+	#ue_ = percent_error(ue)
+	u_max = ev(max(u), 0.01)
 
 	delta_f = f2_ - f1_
 
 	#Q aus resonanzueberhoeung:
-	Q_u = u_max / percent_error(u[1])
+	Q_u = u_max / ev(u[1], 0.01)
 	note('Q aus der Resonanzueberhoehung:')
 	note('Q_u = ' + str(Q_u))
 
@@ -297,6 +346,13 @@ def i(preview):
 	Q_3 = w0 * L / R
 	note('Q aus der der letzten Formel:')
 	note('Q_form = ' + str(round(Q_3, 3)))
+
+	#ev(w_max, 25 * 2 * np.pi)
+	w0_q = w_max / (np.sqrt(1 - 1 / (2 * sq(Q_3))))
+	note('w0_theo = {} s^-1'.format(str(w0_q)))
+
+	L = 1 / (w0_q * C)
+	note('L = {}'.format(str(L)))
 
 
 	plt.grid()
