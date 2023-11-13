@@ -1,5 +1,28 @@
+c:
+L = ( 1.7326844 +- 0.2347831 ) * 10^-3 H
+phi = 0.559 +- 0.068
+
+
 e:
+Tiefpass Filter:
 f_gr_theo_lp = 1.061 kHz
-f_gr_exp_lp = 0.589 kHz
+f_gr_exp_lp = 1.194 kHz
+Hochpass Filter:
+Sperrfilter:
 Q_theo = ( 5.3 +- 0.3 ) * 10^0
+
+i:
+f_max_exp = 660.0
+U_max = ( 262.28 +- 1.0 ) * 10^-2 V
+U(f=0) = ( 20.66 +- 1.0 ) * 10^-2 V
+Q aus der Resonanzueberhoehung:
+Q_u = ( 12.7 +- 0.6 ) * 10^0
+Q aus der Resonanzbreite:
+Q_delta_f = ( 13.3 +- 9.5 ) * 10^0
+w_0=4303.315
+f_0=684.894
+Q aus der der letzten Formel:
+Q_form = 16.307
+w0_theo = 105.14115258166814 s^-1
+L = 6340.682504396506
 

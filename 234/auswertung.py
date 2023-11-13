@@ -40,13 +40,20 @@ def c(preview):
 	data = easyparse.parse('data/234c.csv')
 	r = ev(data["r"], 0.1)
 	u = ev(data["u"], 1e-4)
-	i = ev(data["i"], 1e-2)
-	w = ev(data["w"] * 2 * np.pi, 0)
+	i = ev(data["i"], 1e-5)
+	w = ev(data["f"] * 2 * np.pi, 0)
 
 	z = u/i
+
 	wl = (z**2 - r**2) ** 0.5
 
-	note("L = " + str(wl / w) + ' H')
+	L = wl / w
+
+	note("L = " + str(L) + ' H')
+
+	phi = np.arctan(float(wl) / float(r))
+	d_phi = (sq(float(r) * (wl.error) / sq(float(z))) + sq(float(wl) * (r.error) / sq(float(z)))) ** 0.5
+	note('phi = {} +- {}'.format(round(phi, 3), round(d_phi, 3)))
 
 	labelR = "R=" + str(r) + r"$\Omega$"
 	labelZ = "|Z|=" + str(z) + r"$\Omega$"
@@ -54,10 +61,10 @@ def c(preview):
 
 	plt.axis('scaled')
 	plt.grid()
-	plt.xlim([-0.1, float(r) + 1])
-	plt.ylim([-0.1, float(wl) + 1])
-	plt.xlabel("Im(Z)")
-	plt.ylabel("Re(Z)")
+	plt.ylim([-0.1, float(wl) + 0.5])
+	plt.xlim([-0.1, float(r) + 0.5])
+	plt.ylabel("Im(Z)")
+	plt.xlabel("Re(Z)")
 	plt.arrow(0, 0, float(r), float(wl), width=0.01, head_width=0.1, head_length=0.1, label=labelZ, color="blue", length_includes_head=True)
 	plt.arrow(float(r), 0, 0, float(wl), width=0.01, head_width=0.1, head_length=0.1, label=labelWL, color="red", length_includes_head=True)
 	plt.arrow(0, 0, float(r), 0, width=0.01, head_width=0.1, head_length=0.1, label=labelR, color="green", length_includes_head=True)
@@ -174,12 +181,13 @@ def filter_graph(data, suffix, preview):
 
 	plt.xscale('log')
 	#plt.yscale('function', functions=(inverse, forward))
-	plt.ylim([min(db_values) - 1, 0.5])
+	plt.ylim([min(db_values) - 1, max([max(db_values), 0.0]) + 0.5])
 
 	plt.ylabel(r'$dB(A) = 20 \times \log_{10}{(\frac{U_a}{U_e})}$')
 	plt.xlabel(r'$\Omega = \frac{\nu}{\nu_{gr}}$')
 
 	if suffix == 'b':
+		note('Sperrfilter:')
 		f0_index = np.where(ua == min(ua))[0][0]
 		f0 = f[f0_index]
 		f0_ = ev(f0, f0 * 5e-2)
@@ -208,6 +216,8 @@ def filter_graph(data, suffix, preview):
 
 
 	else:	
+		if suffix == 'lp': note('Tiefpass Filter:')
+		else: note('Hochpass Filter:')
 		fgr_theo = 1e-3 / (2 * np.pi * R * C) #1e-3 hz -> khz
 		fgr = all_intersects(f, ua, ue / np.sqrt(2))[0]
 		fgr_label = r'$ \nu_{gr} =' + str(round(fgr, 3)) + ' kHz$'
@@ -287,7 +297,7 @@ def e(preview):
 		'dB_Tiefpass': lp, 
 		'delta_dB_Hochpass': lpe,
 	}, 'results/234e_lp.csv')
-	
+
 	easyparse.write_printable({
 		'dB_Hochpass': hp, 
 		'delta_dB_highpass': hpe,

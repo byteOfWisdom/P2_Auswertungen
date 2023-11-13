@@ -15,7 +15,7 @@ def pointer(x, y, dx, dy):
 	plt.arrow(
 		float(x), float(y), 
 		float(dx), float(dy), 
-		width=0.005, 
+		width=0.001, 
 		#head_width=0.1, 
 		#head_length=0.1, 
 		length_includes_head=True,
