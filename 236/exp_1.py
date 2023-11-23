@@ -1,5 +1,7 @@
 import labtools as tools
 from scipy.stats import linregress
+from labtools.defaults import *
+
 
 def c(preview, data_file=None):
 	tools.notes.note('c-f:')
@@ -36,6 +38,11 @@ def c(preview, data_file=None):
 		xerr = res_err,
 		yerr = angle_err / tools.misc.sq(angle), 
 		label='Messdaten')
+
+	write_printable({
+		'phi': ev(angle, angle_err),
+		'1 / phi': 1 / ev(angle, angle_err),
+		}, 'results/236d.csv')
 	
 	temp1 = a.value # i don't fucking know why this is needed
 	temp2 = b.value
