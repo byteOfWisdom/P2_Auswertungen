@@ -116,11 +116,12 @@ def find_elemental_charge(charges, preview):
 
     if not preview:
         write_printable({
-            "N / n": [round(i, 3) for i in best_match],
+            "N / n = q / (q_min / n)": [round(i, 3) for i in best_match],
             'N': (best_match * best_n),
             'e_si': ev(charges / (best_match * best_n), 0.0),
             }, 'results/242h.csv', 3)
 
+    note_var('bestes n', best_n)
     return tools.np.sum(ev(charges, errors) / ev(tools.np.round(best_match) * best_n, best_match)) / len(charges), ev(charges, errors) / ev(best_match * best_n, best_match * 1)
 
 

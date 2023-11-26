@@ -20,7 +20,7 @@ def c(preview, data=None):
     dI = I * 1e-3 + 3 * 5e-3 # 1 % plus 5% des messbereichs
     I = ev(I, dI)
 
-    B = ev(table[2], table[2] * 1e-2) * 1e-3
+    B = ev(table[2], 1) * 1e-3
     N = data['b']['N']
     d = ev(2e-3, 0.05e-3)
     l = ev(477e-3, 2e-3)
@@ -48,8 +48,12 @@ def c(preview, data=None):
 
     mu_max = approx_mu_max(value(H[start:end]), value(B[start:end]))
 
-    note_var('mu_max', mu_max)
-    note_var('mu_A', mu_A)
+    note_var('mu_max', mu_max, unit='N/A^2')
+    note_var('mu_A', mu_A, unit='N/A^2')
+    note_var('mu_max', mu_max / mu0, unit='mu_0')
+    note_var('mu_A', mu_A / mu0, unit='mu_0')
+    note_var('d_mu', 1e-5 / mu0, unit='mu_0')
+
 
     if not some(mu_max): 
         print('failed to find mu_max')
@@ -57,9 +61,18 @@ def c(preview, data=None):
 
 
     plot = Plot(r'$H [\frac{A}{m}]$', 'B [T]')
-    plot.title = ''
+    plot.title = 'Hysterese Kurve'
     plot.add_element(ev(value(H), 0), ev(value(B), 0), 'Messdaten')
-    plot.add_element(lambda x: x * mu_A, r'$\mu_0$', color='red')
+    plot.add_element(lambda x: x * mu_A, r'$\mu_A$', color='red')
     plot.add_element(lambda x: x * mu_max, r'$\mu_{max}$', color='green')
 
-    plot.finish(preview, 'results/240c.png')
+    plot.finish(preview, 'results/240c.png')    
+
+
+    plot = Plot(r'$H [\frac{A}{m}]$', 'B [T]')
+    plot.title = 'Hysterse Kurve mit Fehlerbalken'
+    plot.add_element(H, B, 'Messdaten')
+    plot.add_element(lambda x: x * mu_A, r'$\mu_A$', color='red')
+    plot.add_element(lambda x: x * mu_max, r'$\mu_{max}$', color='green')
+
+    plot.finish(preview, 'results/240c_fehlerbalken.png')
