@@ -83,56 +83,8 @@ def find_elemental_charge(charges, preview):
     # by that smallest are as close as possible to integers
 
     e = math.agcd(value(charges))
-
     ns = np.round(value(charges) / e)
-
     return e, charges / ns
-
-    """
-    # this is the old approach. it is not good.
-    charges, errors = tools.p.unzip(charges)
-
-    least_q = min(charges)
-
-    end = 200
-
-    lowest_dev = 1000 # just a large number
-    best_match = None
-    best_n = None
-
-    deviations = []
-    ns = []
-
-
-    for n in range(1, end):
-        relative_charges = charges / (least_q / n)
-        deviation = tools.np.abs(relative_charges - tools.np.round(relative_charges))
-
-        ns.append(n)
-        deviations.append(tools.np.sum(deviation ** 2))
-
-        if tools.np.sum(deviation ** 2) < lowest_dev:
-            lowest_dev = tools.np.sum(deviation ** 2)
-            best_n = n
-            best_match = np.round(relative_charges)
-
-
-    plot = tools.Plot('kleinste ladungszahl', 'Abweichung')
-    plot.title = 'Abweichung bei verschiedenen vermuteten n'
-    plot.add_element(ns, deviations)
-    plot.finish(preview, 'results/242g_ladungszahl.png')
-
-
-    if not preview:
-        write_printable({
-            "N / n = q / (q_min / n)": [round(i, 3) for i in best_match],
-            'N': (best_match * best_n),
-            'e_si': ev(charges / (best_match * best_n), 0.0),
-            }, 'results/242h.csv', 3)
-
-    note_var('bestes n', best_n)
-    return tools.np.sum(ev(charges, errors) / ev(tools.np.round(best_match) * best_n, best_match)) / len(charges), ev(charges, errors) / ev(best_match * best_n, best_match * 1)
-"""
 
 
 def g(preview, data=None):
