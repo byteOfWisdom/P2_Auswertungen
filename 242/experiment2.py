@@ -1,7 +1,10 @@
 import labtools as tools
 from labtools.defaults import *
+from labtools import math
+
 
 temp = 0.0
+
 
 def viscocity():
     return np.interp(temp, [0, 20, 40], [17.2e-6, 18.9e-6, 19.12e-6])
@@ -75,13 +78,7 @@ def average(list_of_drops):
     return averaged_drops
 
 
-from labtools import math
 def find_elemental_charge(charges, preview):
-    # represent lists as multiples of the smallest charge
-    # divided by an integer
-    # this integer gets optimized so that all charges divided
-    # by that smallest are as close as possible to integers
-
     e = math.agcd(value(charges))
     ns = np.round(value(charges) / e)
     return e, charges / ns
