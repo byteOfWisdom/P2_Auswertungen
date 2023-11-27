@@ -40,7 +40,7 @@ def t_to_v(droplet_data, s, dt):
 
 
 def radius(drop):
-    return tools.np.sqrt((9 * viscocity() * (drop.v_down - drop.v_up)) / 4 * grav_const * (density_oil - density_air))
+    return tools.np.sqrt((9 * viscocity() * (drop.v_down - drop.v_up)) / (4 * grav_const * (density_oil - density_air)))
 
 
 def charge(drop):
@@ -75,12 +75,21 @@ def average(list_of_drops):
     return averaged_drops
 
 
+from labtools import math
 def find_elemental_charge(charges, preview):
     # represent lists as multiples of the smallest charge
     # divided by an integer
     # this integer gets optimized so that all charges divided
     # by that smallest are as close as possible to integers
 
+    e = math.agcd(value(charges))
+
+    ns = np.round(value(charges) / e)
+
+    return e, charges / ns
+
+    """
+    # this is the old approach. it is not good.
     charges, errors = tools.p.unzip(charges)
 
     least_q = min(charges)
@@ -123,7 +132,7 @@ def find_elemental_charge(charges, preview):
 
     note_var('bestes n', best_n)
     return tools.np.sum(ev(charges, errors) / ev(tools.np.round(best_match) * best_n, best_match)) / len(charges), ev(charges, errors) / ev(best_match * best_n, best_match * 1)
-
+"""
 
 
 def g(preview, data=None):

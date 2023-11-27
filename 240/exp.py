@@ -17,10 +17,10 @@ def c(preview, data=None):
     table = data['b']['cassy']['data']
 
     I = table[1] * data['b']['mirror']
-    dI = I * 1e-3 + 3 * 5e-3 # 1 % plus 5% des messbereichs
-    I = ev(I, dI)
+    dI = I * 1e-2 + 3 * 5e-2 # 1 % plus 5% des messbereichs
+    I = ev(I, dI) # I = (I +- dI) A
 
-    B = ev(table[2], 1) * 1e-3
+    B = ev(table[2], table [2] * 3e-2) * 1e-3
     N = data['b']['N']
     d = ev(2e-3, 0.05e-3)
     l = ev(477e-3, 2e-3)
@@ -55,7 +55,7 @@ def c(preview, data=None):
     note_var('d_mu', 1e-5 / mu0, unit='mu_0')
 
 
-    if not some(mu_max): 
+    if not some(mu_max):
         print('failed to find mu_max')
         return
 
@@ -66,7 +66,7 @@ def c(preview, data=None):
     plot.add_element(lambda x: x * mu_A, r'$\mu_A$', color='red')
     plot.add_element(lambda x: x * mu_max, r'$\mu_{max}$', color='green')
 
-    plot.finish(preview, 'results/240c.png')    
+    plot.finish(preview, 'results/240c.png')
 
 
     plot = Plot(r'$H [\frac{A}{m}]$', 'B [T]')
