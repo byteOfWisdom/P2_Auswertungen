@@ -1,14 +1,10 @@
 [a]
-min = [0, 0, 0, -1, 0, 0, -1, 0, 0, 0]
-max = [12.5, 21, 70, 1, 21, 70, 1, 200, 200, 5]
-scale = [5, 10, 50, 0.5, 10, 50, 0.5, 100, 100, 1]
-dec = [1, 2, 1, 2, 2, 1, 2, 1, 1, 2]
 
-data = 'data/messung_a.csv'
+data = 'data/messung_a.txt'
 
 
 [c]
-data = 'data/messung_c.csv'
+data = 'data/messung_c.txt'
 R1 = 0.6
 R2 = 0.6
 Rv = 0.6
