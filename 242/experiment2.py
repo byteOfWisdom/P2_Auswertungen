@@ -123,9 +123,9 @@ def g(preview, data=None):
     #elemental_charge = tools.math.agcd([c.value for c in charges], avg_err_charges / 100000) # well fuck this ain't working
     tools.notes.note_var('e_si', elemental_charge, unit='C')
 
-    #plot = tools.Plot('Tropen', 'Ladung [C]')
-    #plot.add_element(tools.np.array([n for n in range(len(charges))]), charges)
-    #plot.finish(preview, 'results/242g.png')
+    plot = tools.Plot('Tropfen', 'Ladung [C]')
+    plot.add_element(tools.np.array([n for n in range(len(charges))]), charges)
+    plot.finish(preview, 'results/242g.png')
 
     # aufgabe i
 

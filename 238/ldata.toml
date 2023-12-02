@@ -1,0 +1,16 @@
+accommodate_weirdo = true
+
+
+[a]
+pa_correction=-1
+data = 'data/238a.txt'
+
+
+[c]
+data = 'data/238c.txt'
+pa_correction=1
+pb_correction=-1
+
+R1 = 0.6
+R2 = 0.6
+Rv = 0.6
