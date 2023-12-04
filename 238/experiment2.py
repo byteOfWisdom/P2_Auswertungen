@@ -6,12 +6,6 @@ def c(preview, data=None):
 
     data = data['c']
 
-
-    #['"Zeit" t / s' '"Strom" I_A1 / A' '"Spannung" U_B1 / V'
-    #'"Leistungsfaktor" cos&j_1' '"Strom" I_A2 / A' '"Spannung" U_B2 / V'
-    #'"Leistungsfaktor" cos&j_2' '"P_ein" P_1 / W' '"P_aus" P_2 / W'
-    #'"Frequenz" f / Hz' '\n']
-
     U_a_index = data['data']['headers']['"Spannung" U_B1 / V']
     U_b_index = data['data']['headers']['"Spannung" U_B2 / V']
     I_a_index = data['data']['headers']['"Strom" I_A1 / A']
@@ -19,6 +13,7 @@ def c(preview, data=None):
     P_a_index = data['data']['headers']['"P_ein" P_1 / W']
     P_b_index = data['data']['headers']['"P_aus" P_2 / W']
 
+    # the error assumptions are taken from the manual
     dU_a = data['data']['data'][U_a_index] * 1e-2 + 70 * 0.5e-2
     U_a = ev(data['data']['data'][U_a_index], dU_a)
 
@@ -58,25 +53,22 @@ def c(preview, data=None):
         'U_2 [V]': U_b,
         'I_1 [A]': I_a,
         'I_2 [A]': I_b,
-        'P_w1 [W]': P_a,
-        'P_w2 [W]': P_b,
+        r'P_{w, 1} [W]': P_a,
+        r'P_{w, 2} [W]': P_b,
     }
 
     table2 = {
-        'P_s1 [W]': Ps1,
-        'P_s2 [W]': Ps2,
+        r'P_{s, 1} [W]': Ps1,
+        r'P_{s, 2} [W]': Ps2,
         'P_v [W]': Pv,
-        'P_cu [W]': Pcu,
-        'P_fe [W]': Pfe,
-        'eta': eta,
+        r'P_{cu} [W]': Pcu,
+        r'P_{fe} [W]': Pfe,
+        r'\eta': eta,
     }
 
     if not preview:
         write_printable(table, 'results/rohdaten_c.csv', sig_digits=3)
         write_printable(table2, 'results/berechnete_c.csv', sig_digits=3)
-
-
-
 
 
     plot = Plot(r'$I_2 [A]$', r'P [W]')
@@ -97,7 +89,7 @@ def c(preview, data=None):
     plot.finish(preview, 'results/238c3.png')
 
 
-    # aufgabe e
+    # task e
 
     note_var('U_open', U_a[open_circut], unit='V')
     note_var('I_open', I_a[open_circut], unit='A')
@@ -109,7 +101,7 @@ def c(preview, data=None):
 
 
 
-    # aufgabe f
+    # task f
 
     sigma_one = 1 - sq(I_b[short_circut] / I_a[short_circut])#[0]
     note_var('first sigma', sigma_one)
@@ -126,7 +118,7 @@ def c(preview, data=None):
     sigma_four = (U_a / (I_b * wL))[short_circut]
     note_var('fourth sigma', sigma_four)
 
-    # aufgabe g
+    # task g
 
 
     R = U_b  / I_b
@@ -136,8 +128,8 @@ def c(preview, data=None):
     U_frac = (R / (R + Rv)) * ml / np.sqrt(1 + (temp_2 / temp))
 
     table = {
-        'U2 / U1 gemessen': U_b / U_a,
-        'U2 / U1 berechnet': U_frac,
+        r'\frac{U_2}{U_1} gemessen': U_b / U_a,
+        r'\frac{U_2}{U_1} berechnet': U_frac,
     }
 
     if not preview:

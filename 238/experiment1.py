@@ -63,9 +63,9 @@ def b(preview, data=None):
 
         tools.easyparse.write_printable(
             {
-            'R [Ohm]': R,
+            r'R [\Omega]': R,
             'P_S [W]': P_s,
-            'cos(phi)': cos_phi,
-            'P_S * cos_phi [W]': P_s * cos_phi,
+            r'cos(\varphi)': cos_phi,
+            r'P_S * cos(\varphi) [W]': P_s * cos_phi,
             },
             'results/berechnete_a.csv', 3)
