@@ -12,11 +12,11 @@ def main():
     }
 
     if labtools.task_list.run_task_list(tasks):
-        labtools.notes.print_notes()
+        labtools.defaults.print_notes()
     else:
-        labtools.notes.write_notes('results/notes.txt')
+        labtools.defaults.write_notes('results/notes.txt')
 
-    labtools.easyparse.merge_all()
+    labtools.defaults.merge_all()
 
 if __name__ == '__main__':
     main()
