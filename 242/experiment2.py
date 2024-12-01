@@ -31,13 +31,13 @@ class Drop():
 def is_valid(droplet):
     # checks if the droplet fullfills 2v_0 = v_down - v_up
     # where v_up has a negative sign
-    return tools.p.within_deviation(2 * droplet.v0, droplet.v_down - droplet.v_up)
+    return tools.perror.within_deviation(2 * droplet.v0, droplet.v_down - droplet.v_up)
 
 
 def t_to_v(droplet_data, s, dt):
-    t_0 = tools.p.ev(droplet_data[1], dt)
-    t_up = tools.p.ev(droplet_data[2], dt)
-    t_down = tools.p.ev(droplet_data[3], dt)
+    t_0 = ev(droplet_data[1], dt)
+    t_up = ev(droplet_data[2], dt)
+    t_down = ev(droplet_data[3], dt)
     v_drop = [droplet_data[0], ev(s, 0.01e-3) / t_0, ev(s, 0.01e-3) / t_up, ev(s, 0.01e-3) / t_down]
     return v_drop
 
@@ -99,7 +99,7 @@ def g(preview, data=None):
         'Tropfen': [d.id for d in drops],
         'v0': [d.v0 for d in drops],
         'v_up': [d.v_up for d in drops],
-        'v_down': [d.v_down for d in drops],}, 
+        'v_down': [d.v_down for d in drops],},
         'results/242g_rohdaten.csv')
 
     drops = average(drops)
@@ -121,7 +121,7 @@ def g(preview, data=None):
 
     elemental_charge, esi = find_elemental_charge(charges, preview)
     #elemental_charge = tools.math.agcd([c.value for c in charges], avg_err_charges / 100000) # well fuck this ain't working
-    tools.notes.note_var('e_si', elemental_charge, unit='C')
+    note_var('e_si', elemental_charge, unit='C')
 
     plot = tools.Plot('Tropfen', 'Ladung [C]')
     plot.add_element(tools.np.array([n for n in range(len(charges))]), charges)
@@ -145,8 +145,8 @@ def g(preview, data=None):
 
     plot = Plot(r'$\frac{1}{r} [m^{-1}]$', r'$e_{s,i}^{2/3} [C^{3/2}]$')
     points = plot.add_element(x, y, r'$e_{s,i}^{3/2}$')
-    a, b, da, db = plot.linear_fit(points)
-    plot.add_element(lambda x: a * x + b, 'Gradenfit')
+    func, params = fit_func(lambda x, a, b: a * x + b, x, y)
+    plot.add_element(func, 'Gradenfit')
     plot.title = 'Cunningham - Korrektur'
     plot.finish(preview, 'results/242i.png')
 
@@ -155,12 +155,12 @@ def g(preview, data=None):
 
     plot = Plot(r'$\frac{1}{r} [m^{-1}]$', r'$e_{s,i}^{2/3} [C^{3/2}]$')
     points = plot.add_element(x, y, r'$e_{s,i}^{3/2}$')
-    a, b, da, db = plot.linear_fit(points)
-    plot.add_element(lambda x: a * x + b, 'Gradenfit')
+    func, params = fit_func(lambda x, a, b: a * x + b, x, y)
+    plot.add_element(func, 'Gradenfit')
     plot.title = 'Cunningham - Korrektur'
     plot.finish(preview, 'results/242i_keine_fehlerbalken.png')
 
 
-    note_var('a', ev(a, da))
-    note_var('b', ev(b, db))
-    note_var('e0', ev(b, db) ** (3/2))
+    note_var('a', params[0])
+    note_var('b', params[1])
+    note_var('e0', params[1] ** (3/2))
