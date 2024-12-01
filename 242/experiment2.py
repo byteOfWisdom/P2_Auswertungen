@@ -15,7 +15,8 @@ def viscocity():
 density_air = 1.225
 density_oil = 886
 grav_const = 9.81
-E = 0
+plate_seperation = None
+delta_E_field = 0
 
 class Drop():
     def __init__(self, data, s, dt):
@@ -24,6 +25,7 @@ class Drop():
         self.v0 = v_data[1]
         self.v_up = v_data[2]
         self.v_down = v_data[3]
+        self.E_field = ev(data[4] / plate_seperation, delta_E_field)
         #print('drop: {}, {}, {}'.format(self.v0.value, self.v_down.value, self.v_up.value))
         #print('diff: {}'.format(2 * self.v0.value - (self.v_down.value - self.v_up.value)))
 
@@ -47,7 +49,7 @@ def radius(drop):
 
 
 def charge(drop):
-    return 3 * tools.np.pi * viscocity() * radius(drop) * (drop.v_down + drop.v_up) / E
+    return 3 * tools.np.pi * viscocity() * radius(drop) * (drop.v_down + drop.v_up) / drop.E_field
 
 
 def average(list_of_drops):
@@ -61,13 +63,14 @@ def average(list_of_drops):
         if list_of_drops[i].id == current_id:
             acc.append(list_of_drops[i])
         else:
-            avd = Drop([1, 1, 1, 1], 1, 1)
+            avd = Drop([1, 1, 1, 1, -1], 1, 1)
 
             n = len(acc)
             avd.id = acc[0].id
             avd.v0 = sum(d.v0 for d in acc) / n
             avd.v_down = sum(d.v_down for d in acc) / n
             avd.v_up = sum(d.v_up for d in acc) / n
+            avd.E_field = sum(d.E_field for d in acc) / n
 
             averaged_drops.append(avd)
             current_id = list_of_drops[i].id
@@ -85,10 +88,12 @@ def find_elemental_charge(charges, preview):
 
 
 def g(preview, data=None):
-    global E, temp
+    global temp, plate_seperation, delta_E_field
     data = data['c']
 
-    E = data['U'] / data['plate_seperation']
+    plate_seperation = data['plate_seperation']
+    delta_E_field = data['dU'] / plate_seperation
+    #E_field = data['U'] / data['plate_seperation']
     temp = data['temp']
 
     note_var('viscocity', viscocity())
