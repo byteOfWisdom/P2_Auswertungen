@@ -38,9 +38,9 @@ def b(preview, data=None):
 	note_var('B_E', sum(Be) / len(Be), unit='T')
 
 	table = {
-		'r': r,
-		'B': B,
-		'Be': Be,
+		r'r [m]': r,
+		r'B [T]': B,
+		r'Be [T]': Be,
 	}
 
 	if not preview: write_printable(table, 'results/242b.csv')
