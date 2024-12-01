@@ -5,7 +5,7 @@ n = 130
 R = 150e-3
 c = 0.716 * u0 * n / R
 
-def Bs(I): 
+def Bs(I):
 	return c * I
 
 
@@ -23,13 +23,13 @@ def b(preview, data=None):
 	plot = Plot(r'$U [V]$', r'$(r * I)^2 [(m * A)^2]$')
 	plot.title = 'Spezifische Ladung'
 	p1 = plot.add_element(U, sq(r * I), 'Messdaten')
-	a, b, da, db = plot.linear_fit(p1)
-	plot.add_element(lambda x: a * x + b, 'Gradenfit')
+	func, params = fit_func(lambda x, a, b: a * x + b, U, sq(r * I))
+	plot.add_element(func, 'Gradenfit')
 	plot.finish(preview, 'results/242b.png')
 
-	note_var('a', ev(a, da), unit='(m * A)^2 / V')
+	note_var('a', params[0], unit='(m * A)^2 / V')
 
-	em = 2 / (ev(a, da) * sq(c))
+	em = 2 / (params[0] * sq(c))
 	note_var('e/m', em, unit='C / kg')
 
 
