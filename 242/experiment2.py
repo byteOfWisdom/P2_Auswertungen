@@ -102,9 +102,9 @@ def g(preview, data=None):
 
     if not preview: write_printable({
         'Tropfen': [d.id for d in drops],
-        'v0': [d.v0 for d in drops],
-        'v_up': [d.v_up for d in drops],
-        'v_down': [d.v_down for d in drops],},
+        r'v0 [$\frac{m}{s}$]': [d.v0 for d in drops],
+        r'v_up [$\frac{m}{s}$]': [d.v_up for d in drops],
+        r'v_down [$\frac{m}{s}$]': [d.v_down for d in drops],},
         'results/242g_rohdaten.csv')
 
     drops = average(drops)
@@ -112,12 +112,12 @@ def g(preview, data=None):
     charges = tools.np.array([charge(drop) for drop in drops])
     r = np.array([radius(d) for d in drops])
     if not preview: write_printable({
-        'Tropfen': [d.id for d in drops],
-        'r': r,
-        'v0': [d.v0 for d in drops],
-        'v_up': [d.v_up for d in drops],
-        'v_down': [d.v_down for d in drops],
-        'q': charges,
+        r'Tropfen': [d.id for d in drops],
+        r'r [$m$]': r,
+        r'v0 [$\frac{m}{s}$]': [d.v0 for d in drops],
+        r'v_up [$\frac{m}{s}$]': [d.v_up for d in drops],
+        r'v_down [$\frac{m}{s}$]': [d.v_down for d in drops],
+        r'q [$C$]': charges,
     }, 'results/242g_ladungen.csv')
 
 
@@ -136,12 +136,12 @@ def g(preview, data=None):
 
     if not preview: write_printable({
         'Tropfen': [d.id for d in drops],
-        'r': r,
-        'v0': [d.v0 for d in drops],
-        'v_up': [d.v_up for d in drops],
-        'v_down': [d.v_down for d in drops],
-        'q': charges,
-        'e_si': esi,
+        r'r [$m$]': r,
+        r'v0 [$\frac{m}{s}$]': [d.v0 for d in drops],
+        r'v_up [$\frac{m}{s}$]': [d.v_up for d in drops],
+        r'v_down [$\frac{m}{s}$]': [d.v_down for d in drops],
+        r'q [$C$]': charges,
+        r'e_si [$C$]': esi,
     }, 'results/242g_ladungen.csv')
 
 
