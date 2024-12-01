@@ -82,7 +82,8 @@ def average(list_of_drops):
 
 
 def find_elemental_charge(charges, preview):
-    e = math.agcd(value(charges), 0.000001)
+    diffs = [b - a for a, b in tools.misc.pairs(sorted(charges))]
+    e = math.agcd(value(diffs), 1e-6)
     ns = np.round(value(charges) / e)
     return e, charges / ns
 
