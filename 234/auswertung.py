@@ -7,7 +7,8 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Circle
 
 import easyparse
-from perror import make_errval as ev
+#from perror import make_errval as ev
+from labtools.perror import ev
 import pointer_diagrams
 
 misc_values = ''
@@ -139,7 +140,7 @@ def all_intersects(x, y, y_cutoff):
 	for pair in paired(y):
 		if crosses(*pair, y_cutoff):
 			id0 = list(y).index(pair[0])
-			
+
 			ydiff = y[id0 + 1] - y[id0]
 			xdiff = x[id0 + 1] - x[id0]
 			ycd = y_cutoff - y[id0]
@@ -206,6 +207,7 @@ def filter_graph(data, suffix, preview):
 		note('fgr2 = ' + str(df2_) + ' kHz')
 		note('f0 = ' + str(f0_) + ' kHz')
 		q_exp = f0_ / (df2_ - df1_)
+
 		note('Q_exp = ' + str(q_exp))
 
 		plt.vlines([df1 / f0, df2 / f0], min(db_values) - 2, 1, color="green", linestyle='--', label=r'$\nu_{gr}$')
@@ -215,7 +217,7 @@ def filter_graph(data, suffix, preview):
 		plt.errorbar(f / f0, db_values, db_err, fmt='x', label='Messwerte')
 
 
-	else:	
+	else:
 		if suffix == 'lp': note('Tiefpass Filter:')
 		else: note('Hochpass Filter:')
 		fgr_theo = 1e-3 / (2 * np.pi * R * C) #1e-3 hz -> khz
@@ -274,7 +276,7 @@ def e(preview):
 	try:
 		hp, hpe = filter_graph(highpass, 'hp', preview)
 	except:
-		hpe = db_err(highpass['ua'], highpass['ue']) 
+		hpe = db_err(highpass['ua'], highpass['ue'])
 		hp = db(highpass['ua'], highpass['ue'])
 		plt.plot(highpass['f'], hp, 'x')
 		plt.title('Hochpass Filter, Daten fehlerhaft')
@@ -294,17 +296,17 @@ def e(preview):
 		else: save('results/234_e_b.png')
 
 	easyparse.write_printable({
-		'dB_Tiefpass': lp, 
+		'dB_Tiefpass': lp,
 		'delta_dB_Hochpass': lpe,
 	}, 'results/234e_lp.csv')
 
 	easyparse.write_printable({
-		'dB_Hochpass': hp, 
+		'dB_Hochpass': hp,
 		'delta_dB_highpass': hpe,
 	}, 'results/234e_hp.csv')
 
 	easyparse.write_printable({
-		'dB_Sperrfilter': b, 
+		'dB_Sperrfilter': b,
 		'delta_dB_Sperrfilter': be,
 	}, 'results/234e_b.csv')
 
@@ -379,7 +381,7 @@ def i(preview):
 
 	plt.title('Fig 4: Resonanzkurve des Schwingkreises')
 	plt.legend()
-	
+
 	if preview:
 		plt.show()
 	else:
